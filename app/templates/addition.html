@@ -1,0 +1,30 @@
+{% extends "main.html" %}
+{% block body %}
+    <h1>Task issuer</h1>
+    <form action="" method="post" name="add_task">
+        {{ form.hidden_tag() }}
+        <p>
+            New task message:<br>
+            {{ form.message(size=80) }}<br>
+        </p>
+        <p><input type="submit" value="Launch!"></p>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Msg</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in full_task_list %}
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.msg }}</td>
+                <td>{{ task.status }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
