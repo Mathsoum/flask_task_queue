@@ -1,4 +1,12 @@
 {% extends "main.html" %}
+{% block head %}
+    <script type="text/javascript">
+        setInterval(function () {
+            $('#task_table').load("/_table");
+        }, 5000);
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+{% endblock %}
 {% block body %}
     <h1>Task issuer</h1>
     <form action="" method="post" name="add_task">
@@ -9,22 +17,8 @@
         </p>
         <p><input type="submit" value="Launch!"></p>
     </form>
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Msg</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in full_task_list %}
-            <tr>
-                <td>{{ task.id }}</td>
-                <td>{{ task.msg }}</td>
-                <td>{{ task.status }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+
+    <div id="task_table">
+    {% include "task_table.html" %}
+    </div>
 {% endblock %}

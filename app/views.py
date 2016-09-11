@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, jsonify
 from flask import request
 
 from app import app, tasks, full_task_list
@@ -18,4 +18,17 @@ def add_task():
             tasks.put(Task(request.form['message']))
 
     form = TaskForm()
-    return render_template("addition.html", form=form, full_task_list=full_task_list)
+    return render_template("addition.html", form=form)
+
+
+@app.route('/_table')
+def task_table():
+    print(render_template("task_table.html", full_task_list=full_task_list))
+    return render_template("task_table.html", full_task_list=full_task_list)
+
+
+@app.route('/_add_numbers')
+def add_numbers():
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    return jsonify(result=a + b)
