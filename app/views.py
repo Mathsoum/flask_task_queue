@@ -23,7 +23,6 @@ def add_task():
 
 @app.route('/_table')
 def task_table():
-    print(render_template("task_table.html", full_task_list=full_task_list))
     return render_template("task_table.html", full_task_list=full_task_list)
 
 
