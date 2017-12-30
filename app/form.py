@@ -1,7 +1,7 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired
 
 
-class TaskForm(Form):
-    message = StringField('message', validators=[DataRequired()])
+class TaskForm(FlaskForm):
+    message = StringField(id='message', label='New task message', validators=[DataRequired()])

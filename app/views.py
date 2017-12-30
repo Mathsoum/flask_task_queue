@@ -18,7 +18,7 @@ def add_task():
             tasks.put(Task(request.form['message']))
 
     form = TaskForm()
-    return render_template("addition.html", form=form)
+    return render_template("addition.html", form=form, full_task_list=full_task_list)
 
 
 @app.route('/_table')

@@ -1,15 +1,20 @@
-<table>
+<table class="table table-stripped table-dark">
     <thead>
-    <tr>
-        <th>#</th>
-        <th>Msg</th>
-        <th>Status</th>
-    </tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Msg</th>
+            <th scope="col">Status</th>
+        </tr>
     </thead>
     <tbody>
+        <tr>
+            <th scope="row">{{ "%04d" | format(0) }}</th>
+            <td>_DEFAULT_MSG_</td>
+            <td>_DEFAULT_STATUS_</td>
+        </tr>
     {% for task in full_task_list %}
         <tr>
-            <td>{{ task.id }}</td>
+            <th scope="row">{{ "%04d" | format(task.id) }}</th>
             <td>{{ task.msg }}</td>
             <td>{{ task.status }}</td>
         </tr>

@@ -1,5 +1,6 @@
 {% extends "_base.html" %}
 {% block head %}
+    {{ super() }}
     <script type="text/javascript">
         setInterval(function () {
             $('#task_table').load("/_table");
@@ -7,18 +8,30 @@
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
 {% endblock %}
-{% block body %}
+{% block content %}
+    {{ super() }}
     <h1>Task issuer</h1>
-    <form action="" method="post" name="add_task">
-        {{ form.hidden_tag() }}
-        <p>
-            New task message:<br>
-            {{ form.message(size=80) }}<br>
-        </p>
-        <p><input type="submit" value="Launch!"></p>
+    {% macro render_bootstrap_field(field) %}
+        <div class="form-group {% if field.errors %} error {% endif %}">
+            {{ field.label }}
+            {{ field(class='form-control')|safe }}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    <span class="help-inline">[{{ error }}]</span><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endmacro %}
+    <form method="POST" action="">
+    {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ render_bootstrap_field(form.message) }}
+      </div>
+      <button type="submit" class="btn btn-primary">Start command</button>
     </form>
 
     <div id="task_table">
-    {% include "task_table.html" %}
+        {% include "task_table.html" %}
     </div>
+
 {% endblock %}
