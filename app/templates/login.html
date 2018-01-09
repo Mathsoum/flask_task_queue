@@ -1,0 +1,25 @@
+{% extends "_base.html" %}
+{% block title %}Login - {{ super() }}{% endblock %}
+{% block content %}
+    {{ super() }}
+    {% macro render_bootstrap_field(field) %}
+        <div class="form-group {% if field.errors %} error {% endif %}">
+            {{ field.label }}
+            {{ field(class='form-control')|safe }}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    <span class="help-inline">[{{ error }}]</span><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endmacro %}
+    <form method="POST" action="">
+    {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ render_bootstrap_field(form.username) }}
+        {{ render_bootstrap_field(form.password) }}
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+{% endblock %}
