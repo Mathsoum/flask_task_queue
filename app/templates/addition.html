@@ -3,9 +3,18 @@
     {{ super() }}
     <script type="text/javascript">
         setInterval(function () {
-            $('#task_table').load("/_table");
+            $.getJSON('/_needs_reload', function( data ) {
+                if (data['needs_reload'] === true)
+                    $('#task_table').load("/_table");
+            });
         }, 5000);
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+        $('#start_cmd_button').onclick = function () {
+            $.getJSON('/_needs_reload', function() {
+                $('#task_table').load("/_table");
+            });
+        }
     </script>
 {% endblock %}
 {% block content %}
@@ -27,7 +36,7 @@
       <div class="form-group">
         {{ render_bootstrap_field(form.message) }}
       </div>
-      <button type="submit" class="btn btn-primary">Start command</button>
+      <button id="start_cmd_button" type="submit" class="btn btn-primary">Start command</button>
     </form>
 
     <div id="task_table">
