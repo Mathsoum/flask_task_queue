@@ -11,13 +11,21 @@ from app.user import User
 import url
 
 
+def base_template_context():
+    nav_form = LoginForm()
+    return {'nav_form': nav_form}
+
+
 @_app.route('/')
 def hello_world():
-    return flask.render_template("main.html")
+    context = base_template_context()
+    return flask.render_template("main.html", **context)
 
 
 @_app.route('/login', methods=['GET', 'POST'])
 def login():
+    context = base_template_context()
+
     # Here we use a class of some kind to represent and validate our
     # client-side form data. For example, WTForms is a library that will
     # handle this for us, and we use a custom LoginForm to validate.
@@ -37,7 +45,9 @@ def login():
             return flask.abort(400)
 
         return flask.redirect(next_param or flask.url_for('index'))
-    return flask.render_template('login.html', form=form)
+
+    context["form"] = form
+    return flask.render_template('login.html', **context)
 
 
 @_app.route('/add', methods=['POST', 'GET'])
