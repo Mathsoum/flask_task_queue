@@ -1,5 +1,5 @@
 import flask
-from flask_login import login_user
+from flask_login import login_user, login_required
 import json
 
 import app
@@ -17,8 +17,14 @@ def base_template_context():
 
 
 @_app.route('/')
-def hello_world():
+def index():
     context = base_template_context()
+    context["task_form"] = TaskForm()
+    context["full_task_list"] = full_task_list
+    if len(full_task_list) > 0:
+        context["last_command"] = full_task_list[-1].command
+    else:
+        context["last_command"] = ""
     return flask.render_template("main.html", **context)
 
 
@@ -50,31 +56,24 @@ def login():
     return flask.render_template('login.html', **context)
 
 
-@_app.route('/add', methods=['POST', 'GET'])
-def add_task():
+@_app.route("/launch", methods=['POST'])
+def launch():
+    print("Launching")
     if flask.request.method == 'POST':
-        if flask.request.form['message'] != '':
-            tasks.put(Task(flask.request.form['message']))
+        print("Request == POST")
+        print("Command == %s" % flask.request.form['command'])
+        if flask.request.form['command'] != '':
+            print("Command not empty")
+            tasks.put(Task(flask.request.form['command']))
 
-    form = TaskForm()
-    app.needs_reload = True
-    return flask.render_template("addition.html", form=form, full_task_list=full_task_list)
+    return flask.redirect('/')
+
+
+@_app.route('/details', methods=['GET'])
+def details():
+    return "Task #%04d<br/>Not implemented yet!" % int(flask.request.args["task_id"])
 
 
 @_app.route('/_table')
 def task_table():
     return flask.render_template("task_table.html", full_task_list=full_task_list)
-
-
-@_app.route('/_add_numbers')
-def add_numbers():
-    a = flask.request.args.get('a', 0, type=int)
-    b = flask.request.args.get('b', 0, type=int)
-    return flask.jsonify(result=a + b)
-
-
-@_app.route('/_needs_reload')
-def needs_reload():
-    return_value = app.needs_reload
-    app.needs_reload = False
-    return json.dumps({"needs_reload": return_value})

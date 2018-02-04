@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired
 
 
 class TaskForm(FlaskForm):
-    message = StringField(id='message', label='New task message', validators=[DataRequired()])
+    command = StringField(id='command', label='Command', validators=[DataRequired()])
 
 
 class LoginForm(FlaskForm):

@@ -1,1 +1,33 @@
 {% extends "_base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript">
+        setInterval(function () {
+            $('#task_table').load("/_table");
+        }, 1000);
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form action="/launch" method="post">
+        <div class="row-fluid">
+            <div class="input-group{% if task_form.command.errors %} error{% endif %}">
+                {{ task_form.command(class='form-control col-sm-10', placeholder='Type-in command', autofocus='autofocus', value=last_command)|safe }}
+                <span class="input-group-btn col">
+                    <button type="submit" class="btn btn-primary">Launch</button>
+                </span>
+            </div>
+            {% if task_form.command.errors %}
+                {% for error in task_form.command.errors %}
+                    <span class="help-inline">[{{ error }}]</span><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </form>
+
+    <div id="task_table">
+        {% include "task_table.html" %}
+    </div>
+{% endblock %}

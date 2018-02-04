@@ -13,11 +13,6 @@ login_manager.init_app(app)
 # Load configuration
 app.config.from_object('config')
 
-# This flag is set to True if something has changed in the model.
-# This flag is regularly retrieved by clients to check if the page must be reloaded.
-# FIXME Rework needed to differentiate the different clients. Dunno how tho.
-needs_reload = False
-
 # Task queue handling
 tasks = queue.Queue()
 task_count = 0

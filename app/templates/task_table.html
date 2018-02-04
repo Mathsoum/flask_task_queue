@@ -1,23 +1,29 @@
-<table class="table table-stripped">
+<table class="table table-sm table-reverse">
     <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">Msg</th>
+            <th scope="col">Command</th>
             <th scope="col">Status</th>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <th scope="row">{{ "%04d" | format(0) }}</th>
-            <td>_DEFAULT_MSG_</td>
-            <td>_DEFAULT_STATUS_</td>
-        </tr>
-    {% for task in full_task_list %}
-        <tr>
-            <th scope="row">{{ "%04d" | format(task.id) }}</th>
-            <td>{{ task.msg }}</td>
-            <td>{{ task.status }}</td>
-        </tr>
-    {% endfor %}
+    {% if full_task_list %}
+        {% for task in full_task_list[::-1][:10] %}
+            <tr class="{% if task.status == 'Waiting' %}active{% elif task.status == 'Running' %}warning{% elif task.status == 'OK' %}success{% elif task.status == 'KO' %}danger{% endif %}">
+                <th scope="row">
+                    <form method="post" action="/launch">
+                        <input type="hidden" name="command" id="command" value="{{ task.command }}" />
+                        <button type="submit" name="submit_param" value="submit_value" class="btn btn-link">
+                            {{ "%04d" | format(task.id) }}
+                        </button>
+                    </form>
+                </th>
+                <td style="vertical-align: middle">{{ task.command }}</td>
+                <td style="vertical-align: middle"><a target="_blank" href="/details?task_id={{ task.id }}">{{ task.status }}</a></td>
+            </tr>
+        {% endfor %}
+    {% else %}
+
+    {% endif %}
     </tbody>
 </table>
