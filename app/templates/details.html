@@ -1,0 +1,20 @@
+{% extends "_base.html" %}
+{% block title %}#{{ task.id }} - {{ super() }}{% endblock title %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% block content %}
+    <div class="container-fluid"><h1>Command #{{ task.id }} details</h1></div>
+    <div class="container-fluid"><p><a href="/static/output/{{ task.stdout_file_name }}">Raw file</a></p></div>
+    <pre id="file_content" class="container-fluid"></pre>
+    <div class="container-fluid"><a href="#">Back to top</a></div>
+{% endblock content %}
+{% block body %}
+{{ super() }}
+
+    <script>
+        $(function() {
+            $('#file_content').load('/static/output/{{ task.stdout_file_name }}');
+        });
+    </script>
+{% endblock body %}

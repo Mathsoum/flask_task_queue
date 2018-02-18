@@ -19,7 +19,7 @@
                     </form>
                 </th>
                 <td style="vertical-align: middle">{{ task.command }}</td>
-                <td style="vertical-align: middle"><a target="_blank" href="/details?task_id={{ task.id }}">{{ task.status }}</a></td>
+                <td style="vertical-align: middle"><a target="_blank" href="/details/{{ task.id }}">{{ task.status }}</a></td>
             </tr>
         {% endfor %}
     {% else %}

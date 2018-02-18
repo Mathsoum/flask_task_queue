@@ -39,7 +39,7 @@ class Task:
         self.pid = 0
         self.log_file = ''
         self.success = False
-        self.stdout_file_path = os.path.join(COMMAND_OUTPUT_DIR, Task.CMD_STDOUT_FILE_NAME % self.id)
+        self.stdout_file_name = Task.CMD_STDOUT_FILE_NAME % self.id
         Task.next_task_id += 1
         full_task_list.append(self)
 
@@ -55,12 +55,12 @@ class Task:
             self.status = 'KO'
 
     def start(self):
-        with open(self.stdout_file_path, 'w', encoding=locale.getpreferredencoding()) as stdout_fd:
+        file = os.path.join(COMMAND_OUTPUT_DIR, self.stdout_file_name)
+        with open(file, 'w', encoding="utf-8") as stdout_fd:
             process = None
             exception_output = ''
             try:
-                process = subprocess.run([self.command], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                         encoding=locale.getpreferredencoding(), shell=True)
+                process = subprocess.run([self.command], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
                 exit_code = process.returncode
             except subprocess.SubprocessError as ex:
                 exception_output = 'Exception occurred during the execution of the command [%s]\n%s' % (self.command,
@@ -72,7 +72,7 @@ class Task:
             header_dict = {'command': self.command, 'date': str(datetime.datetime.now()), 'status': self.status}
             stdout_fd.write(Task.CMD_OUTPUT_HEADER.format(**header_dict))
             if process is not None:
-                stdout_fd.write(process.stdout)
+                stdout_fd.write(str(process.stdout, encoding=locale.getpreferredencoding()))
             else:
                 stdout_fd.write(exception_output)
 

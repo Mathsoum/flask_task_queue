@@ -9,6 +9,7 @@ from app.runner import Task
 from app.user import User
 
 import url
+from config import COMMAND_OUTPUT_DIR
 
 
 def base_template_context():
@@ -65,11 +66,21 @@ def launch():
     return flask.redirect('/')
 
 
-@_app.route('/details', methods=['GET'])
-def details():
-    return "Task #%04d<br/>Not implemented yet!" % int(flask.request.args["task_id"])
+@_app.route('/details/<int:task_id>', methods=['GET'])
+def details(task_id):
+    try:
+        context = base_template_context()
+        context["task"] = next(t for t in full_task_list if t.id == int(task_id))
+        return flask.render_template("details.html", **context)
+    except StopIteration:
+        return "Task #%04d<br/>Task not found. Unable to show the details" % int(task_id)
 
 
 @_app.route('/_table')
 def task_table():
     return flask.render_template("task_table.html", full_task_list=full_task_list)
+
+
+@_app.route('/static/output/<path:path>')
+def static_output(path):
+    return flask.send_from_directory(COMMAND_OUTPUT_DIR, path)
