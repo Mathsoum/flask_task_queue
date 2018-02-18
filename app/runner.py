@@ -1,3 +1,4 @@
+import os
 import random
 import threading
 import subprocess
@@ -5,6 +6,7 @@ import subprocess
 import time
 
 from app import full_task_list
+from config import COMMAND_OUTPUT_DIR
 
 
 class Task:
@@ -33,12 +35,21 @@ class Task:
             self.status = 'KO'
 
     def start(self):
-        for sec in range(10, 0, -1):
-            with open('cmd_output_%d.txt' % self.id, 'a') as output_fd:
-                exit_code = subprocess.call(['dir'], stdout=output_fd, shell=True)
-                print('Exit code : %d' % exit_code)
-                print('Task #%d -- %s : %ds' % (self.id, self.command, sec))
-                time.sleep(1)
+        cmd_stdout_path = os.path.join(COMMAND_OUTPUT_DIR, 'cmd_%d_out.txt' % self.id)
+        cmd_stderr_path = os.path.join(COMMAND_OUTPUT_DIR, 'cmd_%d_err.txt' % self.id)
+        with open(cmd_stdout_path, 'w') as stdout_fd:
+            with open(cmd_stderr_path, 'w') as stderr_fd:
+                try:
+                    process = subprocess.run([self.command], stdout=stdout_fd, stderr=stderr_fd, shell=True)
+                    exit_code = process.returncode
+                except subprocess.SubprocessError as ex:
+                    stderr_fd.write('Exception occurred during the execution of the command [%s]\n' % self.command)
+                    stderr_fd.write(str(ex))
+                    exit_code = 1
+
+            self.terminate(exit_code == 0)
+            print('Exit code : %d' % exit_code)
+            print('Command output available here : %s' % cmd_stdout_path)
 
 
 class Runner(threading.Thread):
@@ -52,4 +63,3 @@ class Runner(threading.Thread):
             task.status = 'Running'
             task.start()
             self.queue.task_done()
-            task.terminate(random.choice([True, False]))
