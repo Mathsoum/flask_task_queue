@@ -61,10 +61,8 @@ class Task:
             with open(cmd_stderr_path, 'w', encoding=locale.getpreferredencoding()) as stderr_fd:
                 header_dict = {'command': self.command, 'date': str(datetime.datetime.now())}
                 header_dict.update({'file_type': 'STDOUT'})
-                print(header_dict)
                 stdout_fd.write(Task.CMD_OUTPUT_HEADER.format(**header_dict))
                 header_dict.update({'file_type': 'STDERR'})
-                print(header_dict)
                 stderr_fd.write(Task.CMD_OUTPUT_HEADER.format(**header_dict))
 
                 try:
@@ -82,8 +80,6 @@ class Task:
                 stderr_fd.write(Task.CMD_OUTPUT_FOOTER)
 
         self.terminate(exit_code == 0)
-        print('Exit code : %d' % exit_code)
-        print('Command output available here : %s' % cmd_stdout_path)
 
 
 class Runner(threading.Thread):
