@@ -1,9 +1,8 @@
+import datetime
 import os
-import random
+import sys
 import threading
 import subprocess
-
-import time
 
 from app import full_task_list
 from config import COMMAND_OUTPUT_DIR
@@ -11,6 +10,27 @@ from config import COMMAND_OUTPUT_DIR
 
 class Task:
     next_task_id = 0
+
+    CMD_OUTPUT_HEADER = """\
+==================================================
+===
+=== Command           : {command}
+=== Date of execution : {date}
+=== File type         : {file_type}
+===
+==================================================
+
+"""
+    CMD_OUTPUT_FOOTER = """
+
+==================================================
+===
+=== EOF
+===
+=================================================="""
+
+    CMD_STDOUT_FILE_NAME = 'cmd_%d_out.txt'
+    CMD_STDERR_FILE_NAME = 'cmd_%d_err.txt'
 
     def __init__(self, command):
         self.command = command
@@ -35,21 +55,35 @@ class Task:
             self.status = 'KO'
 
     def start(self):
-        cmd_stdout_path = os.path.join(COMMAND_OUTPUT_DIR, 'cmd_%d_out.txt' % self.id)
-        cmd_stderr_path = os.path.join(COMMAND_OUTPUT_DIR, 'cmd_%d_err.txt' % self.id)
-        with open(cmd_stdout_path, 'w') as stdout_fd:
-            with open(cmd_stderr_path, 'w') as stderr_fd:
+        cmd_stdout_path = os.path.join(COMMAND_OUTPUT_DIR, Task.CMD_STDOUT_FILE_NAME % self.id)
+        cmd_stderr_path = os.path.join(COMMAND_OUTPUT_DIR, Task.CMD_STDERR_FILE_NAME % self.id)
+        with open(cmd_stdout_path, 'w', encoding=sys.getdefaultencoding()) as stdout_fd:
+            with open(cmd_stderr_path, 'w', encoding=sys.getdefaultencoding()) as stderr_fd:
+                header_dict = {'command': self.command, 'date': str(datetime.datetime.now())}
+                header_dict.update({'file_type': 'STDOUT'})
+                print(header_dict)
+                stdout_fd.write(Task.CMD_OUTPUT_HEADER.format(**header_dict))
+                header_dict.update({'file_type': 'STDERR'})
+                print(header_dict)
+                stderr_fd.write(Task.CMD_OUTPUT_HEADER.format(**header_dict))
+
                 try:
-                    process = subprocess.run([self.command], stdout=stdout_fd, stderr=stderr_fd, shell=True)
+                    process = subprocess.run([self.command], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                             encoding=sys.getdefaultencoding(), shell=True)
+                    stdout_fd.write(process.stdout)
+                    stderr_fd.write(process.stderr)
                     exit_code = process.returncode
                 except subprocess.SubprocessError as ex:
                     stderr_fd.write('Exception occurred during the execution of the command [%s]\n' % self.command)
                     stderr_fd.write(str(ex))
                     exit_code = 1
 
-            self.terminate(exit_code == 0)
-            print('Exit code : %d' % exit_code)
-            print('Command output available here : %s' % cmd_stdout_path)
+                stdout_fd.write(Task.CMD_OUTPUT_FOOTER)
+                stderr_fd.write(Task.CMD_OUTPUT_FOOTER)
+
+        self.terminate(exit_code == 0)
+        print('Exit code : %d' % exit_code)
+        print('Command output available here : %s' % cmd_stdout_path)
 
 
 class Runner(threading.Thread):
