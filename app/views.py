@@ -58,12 +58,8 @@ def login():
 
 @_app.route("/launch", methods=['POST'])
 def launch():
-    print("Launching")
     if flask.request.method == 'POST':
-        print("Request == POST")
-        print("Command == %s" % flask.request.form['command'])
         if flask.request.form['command'] != '':
-            print("Command not empty")
             tasks.put(Task(flask.request.form['command']))
 
     return flask.redirect('/')
