@@ -1,6 +1,6 @@
 import datetime
+import locale
 import os
-import sys
 import threading
 import subprocess
 
@@ -57,8 +57,8 @@ class Task:
     def start(self):
         cmd_stdout_path = os.path.join(COMMAND_OUTPUT_DIR, Task.CMD_STDOUT_FILE_NAME % self.id)
         cmd_stderr_path = os.path.join(COMMAND_OUTPUT_DIR, Task.CMD_STDERR_FILE_NAME % self.id)
-        with open(cmd_stdout_path, 'w', encoding=sys.getdefaultencoding()) as stdout_fd:
-            with open(cmd_stderr_path, 'w', encoding=sys.getdefaultencoding()) as stderr_fd:
+        with open(cmd_stdout_path, 'w', encoding=locale.getpreferredencoding()) as stdout_fd:
+            with open(cmd_stderr_path, 'w', encoding=locale.getpreferredencoding()) as stderr_fd:
                 header_dict = {'command': self.command, 'date': str(datetime.datetime.now())}
                 header_dict.update({'file_type': 'STDOUT'})
                 print(header_dict)
@@ -69,7 +69,7 @@ class Task:
 
                 try:
                     process = subprocess.run([self.command], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                             encoding=sys.getdefaultencoding(), shell=True)
+                                             encoding=locale.getpreferredencoding(), shell=True)
                     stdout_fd.write(process.stdout)
                     stderr_fd.write(process.stderr)
                     exit_code = process.returncode
