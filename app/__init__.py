@@ -1,4 +1,6 @@
+import os
 import queue
+import config
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
@@ -12,6 +14,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 # Load configuration
 app.config.from_object('config')
+
+# Init the command output directory
+os.makedirs(config.COMMAND_OUTPUT_DIR, mode=0o0750, exist_ok=True)
 
 # Task queue handling
 tasks = queue.Queue()
