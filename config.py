@@ -1,18 +1,18 @@
-import locale
 import os
-import sys
 
-DEBUG = True
-WTF_CSRF_ENABLED = True
-SECRET_KEY = 'this_is_my_secret_key'
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-# Log directory to store command outputs
-COMMAND_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(os.path.normcase(__file__))), 'output')
+class Config(object):
+    # Global Flask config
+    DEBUG = True
+    WTF_CSRF_ENABLED = True
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'some_high_tek_generated_key'
 
-print(sys.stdout.encoding)
-print(sys.stdout.isatty())
-print(locale.getpreferredencoding())
-print(sys.getfilesystemencoding())
-print(os.environ["PYTHONIOENCODING"])
-print(chr(246), chr(9786), chr(9787))
+    # Log directory to store command outputs
+    COMMAND_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(os.path.normcase(__file__))), 'output')
+
+    # SQL Alchemy
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+

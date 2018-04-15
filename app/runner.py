@@ -5,7 +5,7 @@ import threading
 import subprocess
 
 from app import full_task_list
-from config import COMMAND_OUTPUT_DIR
+from config import Config
 
 
 class Task:
@@ -55,7 +55,7 @@ class Task:
             self.status = 'KO'
 
     def start(self):
-        file = os.path.join(COMMAND_OUTPUT_DIR, self.stdout_file_name)
+        file = os.path.join(Config.COMMAND_OUTPUT_DIR, self.stdout_file_name)
         with open(file, 'w', encoding="utf-8") as stdout_fd:
             process = None
             exception_output = ''

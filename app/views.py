@@ -1,15 +1,13 @@
 import flask
-from flask_login import login_user, login_required
-import json
+from flask_login import login_user
 
-import app
 from app import app as _app, tasks, full_task_list
 from app.form import TaskForm, LoginForm
 from app.runner import Task
 from app.user import User
 
 import url
-from config import COMMAND_OUTPUT_DIR
+from config import Config
 
 
 def base_template_context():
@@ -83,4 +81,4 @@ def task_table():
 
 @_app.route('/static/output/<path:path>')
 def static_output(path):
-    return flask.send_from_directory(COMMAND_OUTPUT_DIR, path)
+    return flask.send_from_directory(Config.COMMAND_OUTPUT_DIR, path)
