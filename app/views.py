@@ -1,10 +1,10 @@
 import flask
-from flask_login import login_user
+from flask_login import login_user, current_user, logout_user
 
 from app import app as _app, tasks, full_task_list
 from app.form import TaskForm, LoginForm
 from app.runner import Task
-from app.user import User
+from app.models import User
 
 import url
 from config import Config
@@ -31,17 +31,19 @@ def index():
 def login():
     context = base_template_context()
 
-    # Here we use a class of some kind to represent and validate our
-    # client-side form data. For example, WTForms is a library that will
-    # handle this for us, and we use a custom LoginForm to validate.
+    # If user already logged in, redirect to index
+    if current_user.is_authenticated:
+        return flask.redirect(flask.url_for('index'))
+
     form = LoginForm()
     if form.validate_on_submit():
-        # Login and validate the user.
-        # user should be an instance of your `User` class
-        user = User.get(u'')
-        login_user(user)
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flask.flash('Invalid username or password', 'danger')
+            return flask.redirect(flask.url_for('login'))
 
-        flask.flash('Logged in successfully.')
+        login_user(user)
+        flask.flash('Logged in successfully.', 'success')
 
         next_param = flask.request.args.get('next')
         # is_safe_url should check if the url is safe for redirects.
@@ -53,6 +55,12 @@ def login():
 
     context["form"] = form
     return flask.render_template('login.html', **context)
+
+
+@_app.route('/logout')
+def logout():
+    logout_user()
+    return flask.redirect(flask.url_for('index'))
 
 
 @_app.route("/launch", methods=['POST'])

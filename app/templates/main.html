@@ -11,23 +11,27 @@
 {% endblock %}
 
 {% block content %}
-    <form action="/launch" method="post">
-        <div class="row-fluid">
-            <div class="input-group{% if task_form.command.errors %} error{% endif %}">
-                {{ task_form.command(class='form-control col-sm-10', placeholder='Type-in command', autofocus='autofocus', value=last_command)|safe }}
-                <span class="input-group-btn col">
-                    <button type="submit" class="btn btn-primary">Launch</button>
-                </span>
+    {% if current_user.is_anonymous %}
+        <p class="text-info">Please log in before using the service.</p>
+    {% else %}
+        <form action="/launch" method="post">
+            <div class="row-fluid">
+                <div class="input-group{% if task_form.command.errors %} error{% endif %}">
+                    {{ task_form.command(class='form-control col-sm-10', placeholder='Type-in command', autofocus='autofocus', value=last_command)|safe }}
+                    <span class="input-group-btn col">
+                        <button type="submit" class="btn btn-primary">Launch</button>
+                    </span>
+                </div>
+                {% if task_form.command.errors %}
+                    {% for error in task_form.command.errors %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                {% endif %}
             </div>
-            {% if task_form.command.errors %}
-                {% for error in task_form.command.errors %}
-                    <span class="help-inline">[{{ error }}]</span><br>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </form>
+        </form>
 
-    <div id="task_table">
-        {% include "task_table.html" %}
-    </div>
+        <div id="task_table">
+            {% include "task_table.html" %}
+        </div>
+    {% endif %}
 {% endblock %}
